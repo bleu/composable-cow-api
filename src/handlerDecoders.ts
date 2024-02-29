@@ -91,21 +91,6 @@ export async function decodeAndSaveCoWAmm(
   return { cowAmmParametersId: CoWAmmParameters.id };
 }
 
-export const decodeAndSaveFunctions = {
-  [1]: {
-    "0x34323b933096534e43958f6c7bf44f2bb59424da": decodeAndSaveCoWAmm,
-    "0xe8212f30c28b4aab467df3725c14d6e89c2eb967": decodeAndSaveStopLoss,
-  },
-  [100]: {
-    "0xb148f40fff05b5ce6b22752cf8e454b556f7a851": decodeAndSaveCoWAmm,
-    "0xe8212f30c28b4aab467df3725c14d6e89c2eb967": decodeAndSaveStopLoss,
-  },
-  [11155111]: {
-    "0x4bb23bf4802b4bbe9195637289bb4ffc835b221b": decodeAndSaveCoWAmm,
-    "0xe8212f30c28b4aab467df3725c14d6e89c2eb967": decodeAndSaveStopLoss,
-  },
-};
-
 export function decodeAndSaveHandler(
   handler: `0x${string}`,
   staticInput: `0x${string}`,
@@ -113,17 +98,13 @@ export function decodeAndSaveHandler(
   eventId: string
 ) {
   const chainId = context.network.chainId;
-  const handlerFunction = (
-    decodeAndSaveFunctions[chainId] as {
-      [key: string]: (
-        staticInput: `0x${string}`,
-        context: contextType,
-        eventId: string
-      ) => Promise<any>;
-    }
-  )[handler.toLowerCase()];
-  if (handlerFunction) {
-    return handlerFunction(staticInput, context, eventId);
-  }
+
+  // if (chainId === 1 && handler.toLowerCase() === "0x34323b933096534e43958f6c7bf44f2bb59424da") return decodeAndSaveCoWAmm(staticInput, context, eventId)
+  // if (chainId === 1 && handler.toLowerCase() ==="0xe8212f30c28b4aab467df3725c14d6e89c2eb967") return decodeAndSaveStopLoss(staticInput, context, eventId)
+  if (chainId === 100 && handler.toLowerCase() === "0xb148f40fff05b5ce6b22752cf8e454b556f7a851") return decodeAndSaveCoWAmm(staticInput, context, eventId);
+  if (chainId === 100 && handler.toLowerCase() === "0xe8212f30c28b4aab467df3725c14d6e89c2eb967") return decodeAndSaveStopLoss(staticInput, context, eventId);
+  if (chainId === 11155111 && handler.toLowerCase() === "0x4bb23bf4802b4bbe9195637289bb4ffc835b221b") return decodeAndSaveCoWAmm(staticInput, context, eventId);
+  if (chainId === 11155111 && handler.toLowerCase() === "0xe8212f30c28b4aab467df3725c14d6e89c2eb967") return decodeAndSaveStopLoss(staticInput, context, eventId);
+
   throw new Error("Handler not found");
 }
