@@ -59,10 +59,8 @@ ponder.on(
     });
 
     const user = await getUser(userAddress, context);
-
-    const constantProductDataId = `${event.args.amm}-${user.id}`;
     await context.db.ConstantProductData.update({
-      id: constantProductDataId,
+      id: `${event.args.amm}-${user.id}`,
       data: { disabled: true },
     });
   }

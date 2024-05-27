@@ -1,33 +1,24 @@
 import { Address, decodeAbiParameters } from "viem";
-import { contextType } from "./types";
+import { composableContext } from "./types";
 import { bytes32ToAddress, getToken, getUser } from "./utils";
 import { standaloneConstantProductAbi } from "../abis/StandaloneConstantProduct";
 import { standaloneConstantProductFactoryAbi } from "../abis/StandaloneContantProductFactory";
 
-type OrderType =
-  | "StopLoss"
-  | "ProductConstant"
-  | "StandaloneProductConstant"
-  | undefined;
-
 interface IDecodeAndSaveInput {
   handler: Address;
   staticInput: `0x${string}`;
-  context: contextType;
+  context: composableContext;
   orderId: string;
   owner: Address;
 }
 
 export abstract class IHandlerHelper {
-  abstract type: OrderType;
   abstract decodeAndSaveOrder(
     decodeAndSaveInput: IDecodeAndSaveInput
   ): Promise<void>;
 }
 
 export class StopLossHandlerHelper extends IHandlerHelper {
-  type = "StopLoss" as const;
-
   async decodeAndSaveOrder({
     staticInput,
     context,
@@ -83,8 +74,6 @@ export class StopLossHandlerHelper extends IHandlerHelper {
 }
 
 export class ProductConstantHandlerHelper extends IHandlerHelper {
-  type = "ProductConstant" as const;
-
   async decodeAndSaveOrder({
     staticInput,
     context,
@@ -121,6 +110,7 @@ export class ProductConstantHandlerHelper extends IHandlerHelper {
       priceOracle: cowAmmData[3],
       priceOracleData: cowAmmData[4],
       appData: cowAmmData[5],
+      version: "SafeModule",
     };
 
     const constantProductDataId = `${handler}-${user.id}`;
@@ -133,8 +123,6 @@ export class ProductConstantHandlerHelper extends IHandlerHelper {
   }
 }
 export class StandaloneProductConstantHandlerHelper extends IHandlerHelper {
-  type = "StandaloneProductConstant" as const;
-
   async decodeAndSaveOrder({
     staticInput,
     context,
@@ -188,8 +176,9 @@ export class StandaloneProductConstantHandlerHelper extends IHandlerHelper {
       priceOracleData: cowAmmData[2],
       appData: cowAmmData[3],
       disabled: false,
+      version: "Standalone",
     };
-    const constantProductDataId = `${handler}-${user.id}`;
+    const constantProductDataId = `${owner}-${user.id}`;
 
     await context.db.ConstantProductData.upsert({
       id: constantProductDataId,
@@ -199,7 +188,7 @@ export class StandaloneProductConstantHandlerHelper extends IHandlerHelper {
   }
 }
 
-export function getHandlerHelper(address: Address, context: contextType) {
+export function getHandlerHelper(address: Address, context: composableContext) {
   const lowerCaseAddress = address.toLowerCase();
   const chainId = context.network.chainId as number;
   if (chainId === 1) {

@@ -63,5 +63,6 @@ export default createSchema((p) => ({
     priceOracleData: p.hex(),
     appData: p.hex(),
     disabled: p.boolean().optional(),
+    version: p.string(),
   }),
 }));
