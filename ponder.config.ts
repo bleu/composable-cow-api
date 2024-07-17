@@ -35,14 +35,14 @@ export default createConfig({
       includeCallTraces: true,
       network: {
         sepolia: {
-          startBlock: 5245332,
+          startBlock: 5072748,
         },
-        gnosis: {
-          startBlock: 31005430,
-        },
-        mainnet: {
-          startBlock: 18937172,
-        },
+        // gnosis: {
+        //   startBlock: 31005430,
+        // },
+        // mainnet: {
+        //   startBlock: 18937172,
+        // },
       },
     },
     composable: {
