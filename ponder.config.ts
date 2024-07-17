@@ -10,7 +10,22 @@ export const COMPOSABLE_COW_ADDRESS =
 export const GP_V2_SETTLEMENT_ADDRESS =
   "0x9008D19f58AAbD9eD0D60971565AA8510560ab41";
 
+function buildSchemaName() {
+  if (!process.env.RAILWAY_SERVICE_NAME || !process.env.RAILWAY_DEPLOYMENT_ID) {
+    return "dev";
+  }
+
+  return `${
+    process.env.RAILWAY_SERVICE_NAME
+  }_${process.env.RAILWAY_DEPLOYMENT_ID.slice(0, 8)}`;
+}
+
 export default createConfig({
+  database: {
+    kind: "postgres",
+    publishSchema: "public",
+    schema: buildSchemaName(),
+  },
   networks: {
     sepolia: {
       chainId: 11155111,
