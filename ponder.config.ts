@@ -43,14 +43,11 @@ export default createConfig({
   contracts: {
     stoploss: {
       abi: StopLossAbi,
-      address: [
-        "0xe8212f30c28b4aab467df3725c14d6e89c2eb967", // 5072748
-        "0xb560a403f8450164b8b745ecca41d8ced93c50a1", // 5949979
-      ],
+      address: "0xb560a403f8450164b8b745ecca41d8ced93c50a1",
       includeCallTraces: true,
       network: {
         sepolia: {
-          startBlock: 5072748,
+          startBlock: 5949979,
         },
         // gnosis: {
         //   startBlock: 31005430,
