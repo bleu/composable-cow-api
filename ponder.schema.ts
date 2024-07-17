@@ -54,6 +54,8 @@ export default createSchema((p) => ({
     tokenAmountOut: p.bigint(),
     appData: p.hex(),
     to: p.hex(),
+    status: p.string().optional(),
+    filledAmount: p.bigint().optional(),
     isSellOrder: p.boolean(),
     isPartiallyFillable: p.boolean(),
     validityBucketSeconds: p.bigint(),

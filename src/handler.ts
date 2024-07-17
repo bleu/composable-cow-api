@@ -97,6 +97,7 @@ class StopLossHandlerHelper extends IHandlerHelper {
         sellTokenPriceOracle: bytes32ToAddress(stopLossData[9]),
         buyTokenPriceOracle: bytes32ToAddress(stopLossData[10]),
         strike: stopLossData[11],
+        status: "open",
         maxTimeSinceLastOracleUpdate: stopLossData[12],
       },
     });

@@ -67,3 +67,30 @@ ponder.on("composable:ConditionalOrderCreated", async ({ event, context }) => {
 
   return;
 });
+
+ponder.on("composable.remove()", async ({ event, context }) => {
+  const [orderHash] = event.args;
+  const { chainId } = context.network;
+
+  const orders = await context.db.Order.findMany({
+    where: {
+      hash: orderHash,
+      chainId,
+    },
+  });
+
+  if (!orders.items?.[0]?.stopLossDataId) return;
+
+  const stopLossData = await context.db.StopLossOrder.findUnique({
+    id: orders.items[0].stopLossDataId,
+  });
+
+  if (!stopLossData) return;
+
+  await context.db.StopLossOrder.update({
+    id: stopLossData.id,
+    data: {
+      status: "cancelled",
+    },
+  });
+});
