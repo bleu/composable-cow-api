@@ -4,16 +4,16 @@
     "dev": "ponder dev",
     "start": "ponder start",
     "codegen": "ponder codegen",
-    "lint": "eslint ."
+    "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
-    "@ponder/core": "0.4.42"
+    "@ponder/core": "0.4.43"
   },
   "devDependencies": {
     "@types/node": "^20.14.11",
     "abitype": "^1.0.5",
-    "eslint": "^9.7.0",
-    "eslint-config-ponder": "^0.4.42",
+    "eslint": "^8.56.0",
+    "eslint-config-ponder": "^0.4.43",
     "typescript": "^5.5.3",
     "viem": "^1.19.15"
   }
