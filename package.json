@@ -7,6 +7,8 @@
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
+    "@cowprotocol/contracts": "^1.6.0",
+    "@cowprotocol/cow-sdk": "^5.3.3",
     "@ponder/core": "0.4.43"
   },
   "devDependencies": {

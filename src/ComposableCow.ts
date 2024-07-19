@@ -1,6 +1,7 @@
 import { ponder } from "@/generated";
 import { getHandlerHelper } from "./handler";
 import { getHash, getUser } from "./utils";
+import { Address } from "viem";
 
 ponder.on("composable:ConditionalOrderCreated", async ({ event, context }) => {
   const handlerHelper = getHandlerHelper(
@@ -22,8 +23,16 @@ ponder.on("composable:ConditionalOrderCreated", async ({ event, context }) => {
     handlerHelper.getOrderHandler(event.args.params.handler, context),
   ]);
 
+  if (!hash) return;
+
   await handlerHelper
-    .decodeAndSaveOrder(event.args.params.staticInput, context, event.log.id)
+    .decodeAndSaveOrder(
+      event.args.params.staticInput,
+      hash,
+      user.address as Address,
+      context,
+      event.log.id
+    )
     .then(async (handlerData) => {
       if (!handlerData.decodedSuccess) return;
       await context.db.Order.create({

@@ -1,6 +1,8 @@
-import { Address, decodeAbiParameters } from "viem";
+import { Address, decodeAbiParameters, keccak256, toHex } from "viem";
 import { contextType } from "./types";
 import { bytes32ToAddress, getToken } from "./utils";
+import { hashOrder, OrderBalance, OrderKind } from "@cowprotocol/contracts";
+import { OrderSigningUtils } from "@cowprotocol/cow-sdk";
 
 type OrderType = "StopLoss" | "ProductConstant" | undefined;
 
@@ -14,6 +16,7 @@ abstract class IHandlerHelper {
   abstract type: OrderType;
   abstract decodeAndSaveOrder(
     staticInput: `0x${string}`,
+    userAddress: Address,
     context: contextType,
     eventId: string
   ): Promise<IOrderDecodingParameters>;
@@ -41,6 +44,7 @@ export class DefaultHandlerHelper extends IHandlerHelper {
 
   async decodeAndSaveOrder(
     _staticInput: `0x${string}`,
+    _userOwner: Address,
     _context: contextType,
     _eventId: string
   ): Promise<IOrderDecodingParameters> {
@@ -55,6 +59,7 @@ class StopLossHandlerHelper extends IHandlerHelper {
 
   async decodeAndSaveOrder(
     staticInput: `0x${string}`,
+    orderOwner: Address,
     context: contextType,
     eventId: string
   ) {
@@ -68,7 +73,7 @@ class StopLossHandlerHelper extends IHandlerHelper {
         { name: "receiver", type: "address" },
         { name: "isSellOrder", type: "bool" },
         { name: "isPartiallyFillable", type: "bool" },
-        { name: "validityBucketSeconds", type: "uint256" },
+        { name: "validTo", type: "uint256" },
         { name: "sellTokenPriceOracle", type: "bytes32" },
         { name: "buyTokenPriceOracle", type: "bytes32" },
         { name: "strike", type: "int256" },
@@ -81,24 +86,55 @@ class StopLossHandlerHelper extends IHandlerHelper {
       getToken(stopLossData[1], context),
     ]);
 
+    const sellAmount = stopLossData[2];
+    const buyAmount = stopLossData[3];
+    const appData = stopLossData[4];
+    const receiver = stopLossData[5];
+    const isSellOrder = stopLossData[6];
+    const partiallyFillable = stopLossData[7];
+    const validTo = stopLossData[8];
+    const feeAmount = 0n;
+
+    const domain = await OrderSigningUtils.getDomain(11155111);
+
+    const orderDigest = hashOrder(domain, {
+      sellToken: tokenIn.address,
+      buyToken: tokenOut.address,
+      sellAmount,
+      buyAmount,
+      receiver,
+      validTo: Number(validTo),
+      appData,
+      feeAmount,
+      kind: isSellOrder ? OrderKind.SELL : OrderKind.BUY,
+      partiallyFillable,
+      sellTokenBalance: OrderBalance.ERC20,
+      buyTokenBalance: OrderBalance.ERC20,
+    });
+
+    const orderUid = `${orderDigest}${orderOwner.slice(2)}${toHex(
+      validTo
+    ).slice(2)}` as `0x${string}`;
+
     const StopLossOrder = await context.db.StopLossOrder.create({
       id: eventId,
       data: {
         orderId: eventId,
         tokenInId: tokenIn.id,
         tokenOutId: tokenOut.id,
-        tokenAmountIn: stopLossData[2],
-        tokenAmountOut: stopLossData[3],
-        appData: stopLossData[4],
-        to: stopLossData[5],
-        isSellOrder: stopLossData[6],
-        isPartiallyFillable: stopLossData[7],
-        validityBucketSeconds: stopLossData[8],
+        tokenAmountIn: sellAmount,
+        tokenAmountOut: buyAmount,
+        appData,
+        to: receiver,
+        isSellOrder,
+        isPartiallyFillable: partiallyFillable,
+        validTo,
         sellTokenPriceOracle: bytes32ToAddress(stopLossData[9]),
         buyTokenPriceOracle: bytes32ToAddress(stopLossData[10]),
         strike: stopLossData[11],
         status: "open",
         maxTimeSinceLastOracleUpdate: stopLossData[12],
+        orderUid,
       },
     });
     return { stopLossDataId: StopLossOrder.id, decodedSuccess: true };
@@ -110,6 +146,7 @@ class ProductConstantHandlerHelper extends IHandlerHelper {
 
   async decodeAndSaveOrder(
     staticInput: `0x${string}`,
+    _orderOwner: Address,
     context: contextType,
     eventId: string
   ) {
@@ -186,19 +223,9 @@ export function getHandlerHelper(address: Address, chainId: number) {
     return new ProductConstantHandlerHelper();
   if (
     chainId === 11155111 &&
-    lowerCaseAddress === "0xe6CDbC068654C506424F7747357F51d0e7caB00e"
+    lowerCaseAddress ===
+      "0xe6CDbC068654C506424F7747357F51d0e7caB00e".toLowerCase()
   )
     return new StopLossHandlerHelper();
   return new DefaultHandlerHelper();
-}
-
-export function decodeAndSaveHandler(
-  handler: `0x${string}`,
-  staticInput: `0x${string}`,
-  context: contextType,
-  eventId: string
-): Promise<IOrderDecodingParameters> {
-  const chainId = context.network.chainId;
-  const handlerHelper = getHandlerHelper(handler, chainId);
-  return handlerHelper.decodeAndSaveOrder(staticInput, context, eventId);
 }

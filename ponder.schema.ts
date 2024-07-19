@@ -58,11 +58,12 @@ export default createSchema((p) => ({
     filledAmount: p.bigint().optional(),
     isSellOrder: p.boolean(),
     isPartiallyFillable: p.boolean(),
-    validityBucketSeconds: p.bigint(),
+    validTo: p.bigint(),
     sellTokenPriceOracle: p.hex(),
     buyTokenPriceOracle: p.hex(),
     strike: p.bigint(),
     maxTimeSinceLastOracleUpdate: p.bigint(),
+    orderUid: p.string(),
   }),
   ConstantProductData: p.createTable({
     id: p.string(),
