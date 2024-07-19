@@ -1,7 +1,6 @@
 import { createConfig } from "@ponder/core";
 import { http } from "viem";
 import { composableCowAbi } from "./abis/ComposableCow";
-import { GPv2SettlementAbi } from "./abis/GPv2Settlement";
 import { StopLossAbi } from "./abis/StopLoss";
 
 export const COMPOSABLE_COW_ADDRESS =
@@ -31,23 +30,37 @@ export default createConfig({
       chainId: 11155111,
       transport: http(process.env.PONDER_RPC_URL_SEPOLIA),
     },
-    gnosis: {
-      chainId: 100,
-      transport: http(process.env.PONDER_RPC_URL_GNOSIS),
-    },
-    mainnet: {
-      chainId: 1,
-      transport: http(process.env.PONDER_RPC_URL_MAINNET),
-    },
+    // gnosis: {
+    //   chainId: 100,
+    //   transport: http(process.env.PONDER_RPC_URL_GNOSIS),
+    // },
+    // mainnet: {
+    //   chainId: 1,
+    //   transport: http(process.env.PONDER_RPC_URL_MAINNET),
+    // },
   },
   contracts: {
-    stoploss: {
-      abi: StopLossAbi,
-      address: "0xb560a403f8450164b8b745ecca41d8ced93c50a1",
-      includeCallTraces: true,
+    // stoploss: {
+    //   abi: StopLossAbi,
+    //   includeCallTraces: true,
+    //   network: {
+    //     sepolia: {
+    //       startBlock: 5245332,
+    //     },
+    //     // gnosis: {
+    //     //   startBlock: 31005430,
+    //     // },
+    //     // mainnet: {
+    //     //   startBlock: 18937172,
+    //     // },
+    //   },
+    // },
+    composable: {
+      abi: composableCowAbi,
+      address: COMPOSABLE_COW_ADDRESS,
       network: {
         sepolia: {
-          startBlock: 5949979,
+          startBlock: 5245332,
         },
         // gnosis: {
         //   startBlock: 31005430,
@@ -55,22 +68,6 @@ export default createConfig({
         // mainnet: {
         //   startBlock: 18937172,
         // },
-      },
-    },
-    composable: {
-      abi: composableCowAbi,
-      address: COMPOSABLE_COW_ADDRESS,
-      includeCallTraces: true,
-      network: {
-        sepolia: {
-          startBlock: 5245332,
-        },
-        gnosis: {
-          startBlock: 31005430,
-        },
-        mainnet: {
-          startBlock: 18937172,
-        },
       },
     },
   },
