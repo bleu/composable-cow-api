@@ -30,29 +30,30 @@ export default createConfig({
       chainId: 11155111,
       transport: http(process.env.PONDER_RPC_URL_SEPOLIA),
     },
-    // gnosis: {
-    //   chainId: 100,
-    //   transport: http(process.env.PONDER_RPC_URL_GNOSIS),
-    // },
-    // mainnet: {
-    //   chainId: 1,
-    //   transport: http(process.env.PONDER_RPC_URL_MAINNET),
-    // },
+    gnosis: {
+      chainId: 100,
+      transport: http(process.env.PONDER_RPC_URL_GNOSIS),
+    },
+    mainnet: {
+      chainId: 1,
+      transport: http(process.env.PONDER_RPC_URL_MAINNET),
+    },
   },
   contracts: {
     gpv2Settlement: {
       abi: GPv2SettlementAbi,
       address: GP_V2_SETTLEMENT_ADDRESS,
       network: {
+        // this is only used for stop loss orders, so we will use the deployments of the stop loss handler
         sepolia: {
-          startBlock: 6340810,
+          startBlock: 6333833,
         },
-        // gnosis: {
-        //   startBlock: 31005430,
-        // },
-        // mainnet: {
-        //   startBlock: 18937172,
-        // },
+        gnosis: {
+          startBlock: 35096325, // TODO: update when deployed
+        },
+        mainnet: {
+          startBlock: 20362567, // TODO: update when deployed
+        },
       },
     },
     composable: {
@@ -60,14 +61,14 @@ export default createConfig({
       address: COMPOSABLE_COW_ADDRESS,
       network: {
         sepolia: {
-          startBlock: 6340810,
+          startBlock: 5245332,
         },
-        // gnosis: {
-        //   startBlock: 31005430,
-        // },
-        // mainnet: {
-        //   startBlock: 18937172,
-        // },
+        gnosis: {
+          startBlock: 31005430,
+        },
+        mainnet: {
+          startBlock: 18937172,
+        },
       },
     },
   },
