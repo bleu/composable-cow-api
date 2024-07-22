@@ -120,10 +120,10 @@ class StopLossHandlerHelper extends IHandlerHelper {
       id: `${orderUid.toLowerCase()}-${context.network.chainId}`,
       data: {
         orderId: eventId,
-        tokenInId: tokenIn.id,
-        tokenOutId: tokenOut.id,
-        tokenAmountIn: sellAmount,
-        tokenAmountOut: buyAmount,
+        tokenSellId: tokenIn.id,
+        tokenBuyId: tokenOut.id,
+        tokenSelAmount: sellAmount,
+        tokenBuyAmount: buyAmount,
         appData,
         to: receiver,
         isSellOrder,
@@ -133,8 +133,10 @@ class StopLossHandlerHelper extends IHandlerHelper {
         buyTokenPriceOracle: bytes32ToAddress(stopLossData[10]),
         strike: stopLossData[11],
         maxTimeSinceLastOracleUpdate: stopLossData[12],
-        filledAmount: 0n,
         orderUid,
+        executedTokenBuyAmount: 0n,
+        executedTokenSellAmount: 0n,
+        filledPctBpt: 0n,
       },
     });
     return { stopLossDataId: StopLossOrder.id, decodedSuccess: true };
