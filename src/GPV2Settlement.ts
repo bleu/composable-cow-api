@@ -5,10 +5,7 @@ ponder.on("gpv2Settlement:Trade", async ({ event, context }) => {
   const relatedStopLossOrder = await context.db.StopLossOrder.findUnique({
     id: `${orderUid}-${context.network.chainId}`,
   });
-  console.log(`stoplossId: ${orderUid}-${context.network.chainId}`);
-  console.log(`relatedStopLossOrder: ${relatedStopLossOrder}`);
   if (!relatedStopLossOrder) return;
-  console.log(`orderUid: ${orderUid}`);
 
   const tradedAmount = relatedStopLossOrder.isSellOrder
     ? event.args.sellAmount
