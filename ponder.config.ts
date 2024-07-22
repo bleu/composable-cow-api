@@ -1,7 +1,7 @@
 import { createConfig } from "@ponder/core";
 import { http } from "viem";
 import { composableCowAbi } from "./abis/ComposableCow";
-import { StopLossAbi } from "./abis/StopLoss";
+import { GPv2SettlementAbi } from "./abis/GPv2Settlement";
 
 export const COMPOSABLE_COW_ADDRESS =
   "0xfdaFc9d1902f4e0b84f65F49f244b32b31013b74";
@@ -40,27 +40,27 @@ export default createConfig({
     // },
   },
   contracts: {
-    // stoploss: {
-    //   abi: StopLossAbi,
-    //   includeCallTraces: true,
-    //   network: {
-    //     sepolia: {
-    //       startBlock: 5245332,
-    //     },
-    //     // gnosis: {
-    //     //   startBlock: 31005430,
-    //     // },
-    //     // mainnet: {
-    //     //   startBlock: 18937172,
-    //     // },
-    //   },
-    // },
+    gpv2Settlement: {
+      abi: GPv2SettlementAbi,
+      address: GP_V2_SETTLEMENT_ADDRESS,
+      network: {
+        sepolia: {
+          startBlock: 6340810,
+        },
+        // gnosis: {
+        //   startBlock: 31005430,
+        // },
+        // mainnet: {
+        //   startBlock: 18937172,
+        // },
+      },
+    },
     composable: {
       abi: composableCowAbi,
       address: COMPOSABLE_COW_ADDRESS,
       network: {
         sepolia: {
-          startBlock: 5245332,
+          startBlock: 6340810,
         },
         // gnosis: {
         //   startBlock: 31005430,
