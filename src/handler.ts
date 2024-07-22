@@ -122,7 +122,7 @@ class StopLossHandlerHelper extends IHandlerHelper {
         orderId: eventId,
         tokenSellId: tokenIn.id,
         tokenBuyId: tokenOut.id,
-        tokenSelAmount: sellAmount,
+        tokenSellAmount: sellAmount,
         tokenBuyAmount: buyAmount,
         appData,
         to: receiver,

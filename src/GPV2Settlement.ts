@@ -17,7 +17,7 @@ ponder.on("gpv2Settlement:Trade", async ({ event, context }) => {
   const newFilledAmount = oldTratedAmount + tradedAmount;
 
   const filledPctBpt =
-    (newFilledAmount * BigInt(1000000)) / relatedStopLossOrder.tokenSelAmount;
+    (newFilledAmount * BigInt(1000000)) / relatedStopLossOrder.tokenSellAmount;
 
   await context.db.StopLossOrder.update({
     id: relatedStopLossOrder.id,

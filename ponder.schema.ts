@@ -50,7 +50,7 @@ export default createSchema((p) => ({
     tokenSell: p.one("tokenSellId"),
     tokenBuyId: p.string().references("Token.id"),
     tokenBuy: p.one("tokenBuyId"),
-    tokenSelAmount: p.bigint(),
+    tokenSellAmount: p.bigint(),
     tokenBuyAmount: p.bigint(),
     executedTokenSellAmount: p.bigint(),
     executedTokenBuyAmount: p.bigint(),
