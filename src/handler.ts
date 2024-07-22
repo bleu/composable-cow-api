@@ -1,4 +1,4 @@
-import { Address, decodeAbiParameters, keccak256, toHex } from "viem";
+import { Address, decodeAbiParameters, toHex } from "viem";
 import { contextType } from "./types";
 import { bytes32ToAddress, getToken } from "./utils";
 import { hashOrder, OrderBalance, OrderKind } from "@cowprotocol/contracts";
@@ -117,7 +117,7 @@ class StopLossHandlerHelper extends IHandlerHelper {
     ).slice(2)}` as `0x${string}`;
 
     const StopLossOrder = await context.db.StopLossOrder.create({
-      id: eventId,
+      id: `${orderUid.toLowerCase()}-${context.network.chainId}`,
       data: {
         orderId: eventId,
         tokenInId: tokenIn.id,
@@ -132,8 +132,8 @@ class StopLossHandlerHelper extends IHandlerHelper {
         sellTokenPriceOracle: bytes32ToAddress(stopLossData[9]),
         buyTokenPriceOracle: bytes32ToAddress(stopLossData[10]),
         strike: stopLossData[11],
-        status: "open",
         maxTimeSinceLastOracleUpdate: stopLossData[12],
+        filledAmount: 0n,
         orderUid,
       },
     });
@@ -223,8 +223,7 @@ export function getHandlerHelper(address: Address, chainId: number) {
     return new ProductConstantHandlerHelper();
   if (
     chainId === 11155111 &&
-    lowerCaseAddress ===
-      "0xe6CDbC068654C506424F7747357F51d0e7caB00e".toLowerCase()
+    lowerCaseAddress === "0xe6cdbc068654c506424f7747357f51d0e7cab00e"
   )
     return new StopLossHandlerHelper();
   return new DefaultHandlerHelper();

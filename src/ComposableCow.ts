@@ -28,7 +28,6 @@ ponder.on("composable:ConditionalOrderCreated", async ({ event, context }) => {
   await handlerHelper
     .decodeAndSaveOrder(
       event.args.params.staticInput,
-      hash,
       user.address as Address,
       context,
       event.log.id
