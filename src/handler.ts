@@ -136,7 +136,7 @@ class StopLossHandlerHelper extends IHandlerHelper {
         orderUid,
         executedTokenBuyAmount: 0n,
         executedTokenSellAmount: 0n,
-        filledPctBpt: 0n,
+        filledPctBps: 0n,
       },
     });
     return { stopLossDataId: StopLossOrder.id, decodedSuccess: true };

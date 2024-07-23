@@ -54,7 +54,7 @@ export default createSchema((p) => ({
     tokenBuyAmount: p.bigint(),
     executedTokenSellAmount: p.bigint(),
     executedTokenBuyAmount: p.bigint(),
-    filledPctBpt: p.bigint(),
+    filledPctBps: p.bigint(),
     appData: p.hex(),
     to: p.hex(),
     isSellOrder: p.boolean(),
