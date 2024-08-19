@@ -2,7 +2,6 @@ import { createConfig } from "@ponder/core";
 import { http } from "viem";
 import { composableCowAbi } from "./abis/ComposableCow";
 import { GPv2SettlementAbi } from "./abis/GPv2Settlement";
-import { StopLossAbi } from "./abis/StopLoss";
 
 export const COMPOSABLE_COW_ADDRESS =
   "0xfdaFc9d1902f4e0b84f65F49f244b32b31013b74";
@@ -39,28 +38,34 @@ export default createConfig({
       chainId: 1,
       transport: http(process.env.PONDER_RPC_URL_MAINNET),
     },
+    arbitrum: {
+      chainId: 42161,
+      transport: http(process.env.PONDER_RPC_URL_ARBITRUM),
+    },
   },
   contracts: {
-    stoploss: {
-      abi: StopLossAbi,
-      address: "0xb560a403f8450164b8b745ecca41d8ced93c50a1",
-      includeCallTraces: true,
+    gpv2Settlement: {
+      abi: GPv2SettlementAbi,
+      address: GP_V2_SETTLEMENT_ADDRESS,
       network: {
+        // this is only used for stop loss orders, so we will use the deployments of the stop loss handler
         sepolia: {
-          startBlock: 5949979,
+          startBlock: 6512874,
         },
-        // gnosis: {
-        //   startBlock: 31005430,
-        // },
-        // mainnet: {
-        //   startBlock: 18937172,
-        // },
+        gnosis: {
+          startBlock: 35515980,
+        },
+        mainnet: {
+          startBlock: 20543027,
+        },
+        arbitrum: {
+          startBlock: 243555861,
+        },
       },
     },
     composable: {
       abi: composableCowAbi,
       address: COMPOSABLE_COW_ADDRESS,
-      includeCallTraces: true,
       network: {
         sepolia: {
           startBlock: 5245332,
@@ -70,6 +75,9 @@ export default createConfig({
         },
         mainnet: {
           startBlock: 18937172,
+        },
+        arbitrum: {
+          startBlock: 204751436,
         },
       },
     },

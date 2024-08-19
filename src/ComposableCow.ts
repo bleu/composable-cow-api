@@ -1,6 +1,7 @@
 import { ponder } from "@/generated";
-import { DefaultHandlerHelper, getHandlerHelper } from "./handler";
+import { getHandlerHelper } from "./handler";
 import { getHash, getUser } from "./utils";
+import { Address } from "viem";
 
 ponder.on("composable:ConditionalOrderCreated", async ({ event, context }) => {
   const handlerHelper = getHandlerHelper(
@@ -22,9 +23,17 @@ ponder.on("composable:ConditionalOrderCreated", async ({ event, context }) => {
     handlerHelper.getOrderHandler(event.args.params.handler, context),
   ]);
 
+  if (!hash) return;
+
   await handlerHelper
-    .decodeAndSaveOrder(event.args.params.staticInput, context, event.log.id)
+    .decodeAndSaveOrder(
+      event.args.params.staticInput,
+      user.address as Address,
+      context,
+      event.log.id
+    )
     .then(async (handlerData) => {
+      if (!handlerData.decodedSuccess) return;
       await context.db.Order.create({
         id: event.log.id,
         data: {
@@ -42,55 +51,8 @@ ponder.on("composable:ConditionalOrderCreated", async ({ event, context }) => {
       });
     })
     .catch(async () => {
-      const defaultHandlerHelper = new DefaultHandlerHelper();
-      const handlerData = await defaultHandlerHelper.decodeAndSaveOrder(
-        event.args.params.staticInput,
-        context,
-        event.log.id
-      );
-      await context.db.Order.create({
-        id: event.log.id,
-        data: {
-          hash: hash,
-          txHash: event.transaction.hash,
-          salt: event.args.params.salt,
-          chainId: context.network.chainId,
-          blockNumber: event.block.number,
-          blockTimestamp: event.block.timestamp,
-          staticInput: event.args.params.staticInput,
-          userId: user.id,
-          orderHandlerId: event.args.params.handler,
-          ...handlerData,
-        },
-      });
+      return;
     });
 
   return;
-});
-
-ponder.on("composable.remove()", async ({ event, context }) => {
-  const [orderHash] = event.args;
-  const { chainId } = context.network;
-
-  const orders = await context.db.Order.findMany({
-    where: {
-      hash: orderHash,
-      chainId,
-    },
-  });
-
-  if (!orders.items?.[0]?.stopLossDataId) return;
-
-  const stopLossData = await context.db.StopLossOrder.findUnique({
-    id: orders.items[0].stopLossDataId,
-  });
-
-  if (!stopLossData) return;
-
-  await context.db.StopLossOrder.update({
-    id: stopLossData.id,
-    data: {
-      status: "cancelled",
-    },
-  });
 });
