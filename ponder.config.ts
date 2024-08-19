@@ -38,6 +38,10 @@ export default createConfig({
       chainId: 1,
       transport: http(process.env.PONDER_RPC_URL_MAINNET),
     },
+    arbitrum: {
+      chainId: 42161,
+      transport: http(process.env.PONDER_RPC_URL_ARBITRUM),
+    },
   },
   contracts: {
     gpv2Settlement: {
@@ -46,13 +50,16 @@ export default createConfig({
       network: {
         // this is only used for stop loss orders, so we will use the deployments of the stop loss handler
         sepolia: {
-          startBlock: 6333833,
+          startBlock: 6512874,
         },
         gnosis: {
-          startBlock: 35096325, // TODO: update when deployed
+          startBlock: 35515980,
         },
         mainnet: {
-          startBlock: 20362567, // TODO: update when deployed
+          startBlock: 20543027,
+        },
+        arbitrum: {
+          startBlock: 243555861,
         },
       },
     },
@@ -68,6 +75,9 @@ export default createConfig({
         },
         mainnet: {
           startBlock: 18937172,
+        },
+        arbitrum: {
+          startBlock: 204751436,
         },
       },
     },
