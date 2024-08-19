@@ -197,36 +197,17 @@ export function getHandlerHelper(address: Address, chainId: number) {
     lowerCaseAddress === "0x34323b933096534e43958f6c7bf44f2bb59424da"
   )
     return new ProductConstantHandlerHelper();
-  // if (
-  //   chainId === 1 &&
-  //   [
-  //     "0xe8212f30c28b4aab467df3725c14d6e89c2eb967",
-  //     "0x6a8898f43676d8a3e9a5de286195558c3628a6d4",
-  //   ].includes(lowerCaseAddress)
-  // )
-  //   return new StopLossHandlerHelper();
   if (
     chainId === 100 &&
     lowerCaseAddress === "0xb148f40fff05b5ce6b22752cf8e454b556f7a851"
   )
     return new ProductConstantHandlerHelper();
-  // if (
-  //   chainId === 100 &&
-  //   [
-  //     "0xe8212f30c28b4aab467df3725c14d6e89c2eb967",
-  //     "0x5951ebf7dc5ddb9fd2fd6d5c7f4bc7b7509b463b",
-  //   ].includes(lowerCaseAddress)
-  // )
-  //   return new StopLossHandlerHelper();
   if (
     chainId === 11155111 &&
     "0x4bb23bf4802b4bbe9195637289bb4ffc835b221b" === lowerCaseAddress
   )
     return new ProductConstantHandlerHelper();
-  if (
-    chainId === 11155111 &&
-    lowerCaseAddress === "0xe6cdbc068654c506424f7747357f51d0e7cab00e"
-  )
+  if (lowerCaseAddress === "0x412c36e5011cd2517016d243a2dfb37f73a242e7")
     return new StopLossHandlerHelper();
   return new DefaultHandlerHelper();
 }
