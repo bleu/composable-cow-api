@@ -95,7 +95,7 @@ class StopLossHandlerHelper extends IHandlerHelper {
     const validTo = stopLossData[8];
     const feeAmount = 0n;
 
-    const domain = await OrderSigningUtils.getDomain(11155111);
+    const domain = await OrderSigningUtils.getDomain(context.network.chainId);
 
     const orderDigest = hashOrder(domain, {
       sellToken: tokenIn.address,
