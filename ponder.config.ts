@@ -33,18 +33,18 @@ export default createConfig({
       abi: GPv2SettlementAbi,
       address: GP_V2_SETTLEMENT_ADDRESS,
       chain: {
-        // this is only used for stop loss orders, so we will use the deployments of the stop loss handler
+        // using around 1 jan 2026 as the start block for all chains
         sepolia: {
-          startBlock: 6512874,
+          startBlock: 9960000,
         },
         gnosis: {
-          startBlock: 35515980,
+          startBlock: 43945257,
         },
         mainnet: {
-          startBlock: 18937172,
+          startBlock: 24142260,
         },
         arbitrum: {
-          startBlock: 243555861,
+          startBlock: 416806968,
         },
       },
     },
@@ -53,16 +53,16 @@ export default createConfig({
       address: COMPOSABLE_COW_ADDRESS,
       chain: {
         sepolia: {
-          startBlock: 5245332,
+          startBlock: 9960000,
         },
         gnosis: {
-          startBlock: 31005430,
+          startBlock: 43945257,
         },
         mainnet: {
-          startBlock: 18937172,
+          startBlock: 24142260,
         },
         arbitrum: {
-          startBlock: 204751436,
+          startBlock: 416806968,
         },
       },
     },
