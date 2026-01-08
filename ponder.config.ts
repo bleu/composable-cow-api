@@ -1,4 +1,4 @@
-import { createConfig } from "@ponder/core";
+import { createConfig } from "ponder";
 import { http } from "viem";
 import { composableCowAbi } from "./abis/ComposableCow";
 import { GPv2SettlementAbi } from "./abis/GPv2Settlement";
@@ -9,45 +9,30 @@ export const COMPOSABLE_COW_ADDRESS =
 export const GP_V2_SETTLEMENT_ADDRESS =
   "0x9008D19f58AAbD9eD0D60971565AA8510560ab41";
 
-function buildSchemaName() {
-  if (!process.env.RAILWAY_SERVICE_NAME || !process.env.RAILWAY_DEPLOYMENT_ID) {
-    return "dev";
-  }
-
-  return `${
-    process.env.RAILWAY_SERVICE_NAME
-  }_${process.env.RAILWAY_DEPLOYMENT_ID.slice(0, 8)}`;
-}
-
 export default createConfig({
-  database: {
-    kind: "postgres",
-    publishSchema: "public",
-    schema: buildSchemaName(),
-  },
-  networks: {
+  chains: {
     sepolia: {
-      chainId: 11155111,
-      transport: http(process.env.PONDER_RPC_URL_SEPOLIA),
+      id: 11155111,
+      rpc: http(process.env.PONDER_RPC_URL_SEPOLIA),
     },
     gnosis: {
-      chainId: 100,
-      transport: http(process.env.PONDER_RPC_URL_GNOSIS),
+      id: 100,
+      rpc: http(process.env.PONDER_RPC_URL_GNOSIS),
     },
     mainnet: {
-      chainId: 1,
-      transport: http(process.env.PONDER_RPC_URL_MAINNET),
+      id: 1,
+      rpc: http(process.env.PONDER_RPC_URL_MAINNET),
     },
     arbitrum: {
-      chainId: 42161,
-      transport: http(process.env.PONDER_RPC_URL_ARBITRUM),
+      id: 42161,
+      rpc: http(process.env.PONDER_RPC_URL_ARBITRUM),
     },
   },
   contracts: {
     gpv2Settlement: {
       abi: GPv2SettlementAbi,
       address: GP_V2_SETTLEMENT_ADDRESS,
-      network: {
+      chain: {
         // this is only used for stop loss orders, so we will use the deployments of the stop loss handler
         sepolia: {
           startBlock: 6512874,
@@ -56,7 +41,7 @@ export default createConfig({
           startBlock: 35515980,
         },
         mainnet: {
-          startBlock: 20543027,
+          startBlock: 18937172,
         },
         arbitrum: {
           startBlock: 243555861,
@@ -66,7 +51,7 @@ export default createConfig({
     composable: {
       abi: composableCowAbi,
       address: COMPOSABLE_COW_ADDRESS,
-      network: {
+      chain: {
         sepolia: {
           startBlock: 5245332,
         },

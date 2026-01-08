@@ -1,81 +1,162 @@
-import { createSchema } from "@ponder/core";
+import { onchainTable, relations, index } from "ponder";
 
-export default createSchema((p) => ({
-  Order: p.createTable({
-    id: p.string(),
-    chainId: p.int(),
-    blockNumber: p.bigint(),
-    blockTimestamp: p.bigint(),
-    hash: p.hex().optional(),
-    txHash: p.hex(),
-    salt: p.hex(),
-    userId: p.string().references("User.id"),
-    user: p.one("userId"),
-    staticInput: p.hex(),
-    decodedSuccess: p.boolean(),
-    stopLossDataId: p.string().references("StopLossOrder.id").optional(),
-    stopLossData: p.one("stopLossDataId"),
-    orderHandlerId: p.string().references("OrderHandler.id").optional(),
-    orderHandler: p.one("orderHandlerId"),
-    constantProductDataId: p
-      .string()
-      .references("ConstantProductData.id")
-      .optional(),
-    constantProductData: p.one("constantProductDataId"),
+export const orders = onchainTable(
+  "orders",
+  (t) => ({
+    id: t.text().primaryKey(),
+    chainId: t.integer().notNull(),
+    blockNumber: t.bigint().notNull(),
+    blockTimestamp: t.bigint().notNull(),
+    hash: t.hex(),
+    txHash: t.hex().notNull(),
+    salt: t.hex().notNull(),
+    userId: t.text().notNull(),
+    staticInput: t.hex().notNull(),
+    decodedSuccess: t.boolean().notNull(),
+    stopLossDataId: t.text(),
+    orderHandlerId: t.text(),
+    constantProductDataId: t.text(),
   }),
-  OrderHandler: p.createTable({
-    id: p.string(),
-    type: p.string().optional(),
-    address: p.hex(),
-    chainId: p.int(),
+  (table) => ({
+    userIdx: index().on(table.userId),
+    chainIdx: index().on(table.chainId),
+  })
+);
+
+export const ordersRelations = relations(orders, ({ one }) => ({
+  user: one(users, { fields: [orders.userId], references: [users.id] }),
+  stopLossData: one(stopLossOrders, {
+    fields: [orders.stopLossDataId],
+    references: [stopLossOrders.id],
   }),
-  Token: p.createTable({
-    id: p.string(),
-    address: p.hex(),
-    chainId: p.int(),
-    name: p.string(),
-    symbol: p.string(),
-    decimals: p.int(),
+  orderHandler: one(orderHandlers, {
+    fields: [orders.orderHandlerId],
+    references: [orderHandlers.id],
   }),
-  User: p.createTable({
-    id: p.string(),
-    address: p.string(),
-    chainId: p.int(),
-    orders: p.many("Order.userId"),
-  }),
-  StopLossOrder: p.createTable({
-    id: p.string(),
-    orderId: p.string().references("Order.id"),
-    tokenSellId: p.string().references("Token.id"),
-    tokenSell: p.one("tokenSellId"),
-    tokenBuyId: p.string().references("Token.id"),
-    tokenBuy: p.one("tokenBuyId"),
-    tokenSellAmount: p.bigint(),
-    tokenBuyAmount: p.bigint(),
-    executedTokenSellAmount: p.bigint(),
-    executedTokenBuyAmount: p.bigint(),
-    filledPctBps: p.bigint(),
-    appData: p.hex(),
-    to: p.hex(),
-    isSellOrder: p.boolean(),
-    isPartiallyFillable: p.boolean(),
-    validTo: p.bigint(),
-    sellTokenPriceOracle: p.hex(),
-    buyTokenPriceOracle: p.hex(),
-    strike: p.bigint(),
-    maxTimeSinceLastOracleUpdate: p.bigint(),
-    orderUid: p.string(),
-  }),
-  ConstantProductData: p.createTable({
-    id: p.string(),
-    orderId: p.string().references("Order.id"),
-    token0Id: p.string().references("Token.id"),
-    token0: p.one("token0Id"),
-    token1Id: p.string().references("Token.id"),
-    token1: p.one("token1Id"),
-    minTradedToken0: p.bigint(),
-    priceOracle: p.hex(),
-    priceOracleData: p.hex(),
-    appData: p.hex(),
+  constantProductData: one(constantProductData, {
+    fields: [orders.constantProductDataId],
+    references: [constantProductData.id],
   }),
 }));
+
+export const orderHandlers = onchainTable(
+  "order_handlers",
+  (t) => ({
+    id: t.text().primaryKey(),
+    type: t.text(),
+    address: t.hex().notNull(),
+    chainId: t.integer().notNull(),
+  }),
+  (table) => ({
+    chainIdx: index().on(table.chainId),
+  })
+);
+
+export const tokens = onchainTable(
+  "tokens",
+  (t) => ({
+    id: t.text().primaryKey(),
+    address: t.hex().notNull(),
+    chainId: t.integer().notNull(),
+    name: t.text().notNull(),
+    symbol: t.text().notNull(),
+    decimals: t.integer().notNull(),
+  }),
+  (table) => ({
+    chainIdx: index().on(table.chainId),
+  })
+);
+
+export const users = onchainTable(
+  "users",
+  (t) => ({
+    id: t.text().primaryKey(),
+    address: t.text().notNull(),
+    chainId: t.integer().notNull(),
+  }),
+  (table) => ({
+    chainIdx: index().on(table.chainId),
+  })
+);
+
+export const usersRelations = relations(users, ({ many }) => ({
+  orders: many(orders),
+}));
+
+export const stopLossOrders = onchainTable(
+  "stop_loss_orders",
+  (t) => ({
+    id: t.text().primaryKey(),
+    orderId: t.text().notNull(),
+    tokenSellId: t.text().notNull(),
+    tokenBuyId: t.text().notNull(),
+    tokenSellAmount: t.bigint().notNull(),
+    tokenBuyAmount: t.bigint().notNull(),
+    executedTokenSellAmount: t.bigint().notNull(),
+    executedTokenBuyAmount: t.bigint().notNull(),
+    filledPctBps: t.bigint().notNull(),
+    appData: t.hex().notNull(),
+    to: t.hex().notNull(),
+    isSellOrder: t.boolean().notNull(),
+    isPartiallyFillable: t.boolean().notNull(),
+    validTo: t.bigint().notNull(),
+    sellTokenPriceOracle: t.hex().notNull(),
+    buyTokenPriceOracle: t.hex().notNull(),
+    strike: t.bigint().notNull(),
+    maxTimeSinceLastOracleUpdate: t.bigint().notNull(),
+    orderUid: t.text().notNull(),
+  }),
+  (table) => ({
+    orderIdx: index().on(table.orderId),
+  })
+);
+
+export const stopLossOrdersRelations = relations(stopLossOrders, ({ one }) => ({
+  order: one(orders, {
+    fields: [stopLossOrders.orderId],
+    references: [orders.id],
+  }),
+  tokenSell: one(tokens, {
+    fields: [stopLossOrders.tokenSellId],
+    references: [tokens.id],
+  }),
+  tokenBuy: one(tokens, {
+    fields: [stopLossOrders.tokenBuyId],
+    references: [tokens.id],
+  }),
+}));
+
+export const constantProductData = onchainTable(
+  "constant_product_data",
+  (t) => ({
+    id: t.text().primaryKey(),
+    orderId: t.text().notNull(),
+    token0Id: t.text().notNull(),
+    token1Id: t.text().notNull(),
+    minTradedToken0: t.bigint().notNull(),
+    priceOracle: t.hex().notNull(),
+    priceOracleData: t.hex().notNull(),
+    appData: t.hex().notNull(),
+  }),
+  (table) => ({
+    orderIdx: index().on(table.orderId),
+  })
+);
+
+export const constantProductDataRelations = relations(
+  constantProductData,
+  ({ one }) => ({
+    order: one(orders, {
+      fields: [constantProductData.orderId],
+      references: [orders.id],
+    }),
+    token0: one(tokens, {
+      fields: [constantProductData.token0Id],
+      references: [tokens.id],
+    }),
+    token1: one(tokens, {
+      fields: [constantProductData.token1Id],
+      references: [tokens.id],
+    }),
+  })
+);

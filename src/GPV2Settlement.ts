@@ -1,9 +1,11 @@
-import { ponder } from "@/generated";
+import { ponder } from "ponder:registry";
+import { stopLossOrders } from "ponder:schema";
 
 ponder.on("gpv2Settlement:Trade", async ({ event, context }) => {
   const orderUid = event.args.orderUid.toLowerCase();
-  const relatedStopLossOrder = await context.db.StopLossOrder.findUnique({
-    id: `${orderUid}-${context.network.chainId}`,
+
+  const relatedStopLossOrder = await context.db.find(stopLossOrders, {
+    id: `${orderUid}-${context.chain.id}`,
   });
   if (!relatedStopLossOrder) return;
 
@@ -20,14 +22,15 @@ ponder.on("gpv2Settlement:Trade", async ({ event, context }) => {
     (newFilledAmount * BigInt(1_000_000)) /
     relatedStopLossOrder.tokenSellAmount;
 
-  await context.db.StopLossOrder.update({
-    id: relatedStopLossOrder.id,
-    data: {
+  await context.db
+    .update(stopLossOrders, {
+      id: relatedStopLossOrder.id,
+    })
+    .set({
       executedTokenSellAmount:
         relatedStopLossOrder.executedTokenSellAmount + event.args.sellAmount,
       executedTokenBuyAmount:
         relatedStopLossOrder.executedTokenBuyAmount + event.args.buyAmount,
       filledPctBps,
-    },
-  });
+    });
 });
