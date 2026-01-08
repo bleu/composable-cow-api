@@ -7,16 +7,18 @@
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
-    "@cowprotocol/contracts": "^1.6.0",
-    "@cowprotocol/cow-sdk": "^5.3.3",
-    "@ponder/core": "0.4.43"
+    "@cowprotocol/contracts": "^1.8.0",
+    "@cowprotocol/cow-sdk": "^7.2.9",
+    "hono": "^4.11.3",
+    "ponder": "0.16.1",
+    "viem": "^2.43.5"
   },
   "devDependencies": {
-    "@types/node": "^20.14.11",
-    "abitype": "^1.0.5",
-    "eslint": "^8.56.0",
-    "eslint-config-ponder": "^0.4.43",
-    "typescript": "^5.5.3",
-    "viem": "^1.19.15"
-  }
+    "@types/node": "^25.0.3",
+    "abitype": "^1.2.3",
+    "eslint": "^9.39.2",
+    "eslint-config-ponder": "^0.16.1",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c"
 }

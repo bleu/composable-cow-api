@@ -3,6 +3,11 @@ import { contextType } from "./types";
 import { bytes32ToAddress, getToken } from "./utils";
 import { hashOrder, OrderBalance, OrderKind } from "@cowprotocol/contracts";
 import { OrderSigningUtils } from "@cowprotocol/cow-sdk";
+import {
+  constantProductData,
+  orderHandlers,
+  stopLossOrders,
+} from "ponder:schema";
 
 type OrderType = "StopLoss" | "ProductConstant" | undefined;
 
@@ -21,18 +26,16 @@ abstract class IHandlerHelper {
     eventId: string
   ): Promise<IOrderDecodingParameters>;
   async getOrderHandler(address: Address, context: contextType) {
-    const handlerId = `${address}-${context.network.chainId}`;
-    let handler = await context.db.OrderHandler.findUnique({
+    const handlerId = `${address}-${context.chain.id}`;
+    let handler = await context.db.find(orderHandlers, {
       id: handlerId,
     });
     if (!handler) {
-      handler = await context.db.OrderHandler.create({
+      handler = await context.db.insert(orderHandlers).values({
         id: handlerId,
-        data: {
-          address,
-          type: this.type,
-          chainId: context.network.chainId,
-        },
+        address,
+        type: this.type,
+        chainId: context.chain.id,
       });
     }
     return handler;
@@ -95,7 +98,7 @@ class StopLossHandlerHelper extends IHandlerHelper {
     const validTo = stopLossData[8];
     const feeAmount = 0n;
 
-    const domain = await OrderSigningUtils.getDomain(context.network.chainId);
+    const domain = await OrderSigningUtils.getDomain(context.chain.id);
 
     const orderDigest = hashOrder(domain, {
       sellToken: tokenIn.address,
@@ -116,30 +119,28 @@ class StopLossHandlerHelper extends IHandlerHelper {
       validTo
     ).slice(2)}` as `0x${string}`;
 
-    const StopLossOrder = await context.db.StopLossOrder.create({
-      id: `${orderUid.toLowerCase()}-${context.network.chainId}`,
-      data: {
-        orderId: eventId,
-        tokenSellId: tokenIn.id,
-        tokenBuyId: tokenOut.id,
-        tokenSellAmount: sellAmount,
-        tokenBuyAmount: buyAmount,
-        appData,
-        to: receiver,
-        isSellOrder,
-        isPartiallyFillable: partiallyFillable,
-        validTo,
-        sellTokenPriceOracle: bytes32ToAddress(stopLossData[9]),
-        buyTokenPriceOracle: bytes32ToAddress(stopLossData[10]),
-        strike: stopLossData[11],
-        maxTimeSinceLastOracleUpdate: stopLossData[12],
-        orderUid,
-        executedTokenBuyAmount: 0n,
-        executedTokenSellAmount: 0n,
-        filledPctBps: 0n,
-      },
+    const stopLossOrder = await context.db.insert(stopLossOrders).values({
+      id: `${orderUid.toLowerCase()}-${context.chain.id}`,
+      orderId: eventId,
+      tokenSellId: tokenIn.id,
+      tokenBuyId: tokenOut.id,
+      tokenSellAmount: sellAmount,
+      tokenBuyAmount: buyAmount,
+      appData,
+      to: receiver,
+      isSellOrder,
+      isPartiallyFillable: partiallyFillable,
+      validTo,
+      sellTokenPriceOracle: bytes32ToAddress(stopLossData[9]),
+      buyTokenPriceOracle: bytes32ToAddress(stopLossData[10]),
+      strike: stopLossData[11],
+      maxTimeSinceLastOracleUpdate: stopLossData[12],
+      orderUid,
+      executedTokenBuyAmount: 0n,
+      executedTokenSellAmount: 0n,
+      filledPctBps: 0n,
     });
-    return { stopLossDataId: StopLossOrder.id, decodedSuccess: true };
+    return { stopLossDataId: stopLossOrder.id, decodedSuccess: true };
   }
 }
 
@@ -171,9 +172,10 @@ class ProductConstantHandlerHelper extends IHandlerHelper {
       getToken(cowAmmData[1], context),
     ]);
 
-    const ConstantProductData = await context.db.ConstantProductData.create({
-      id: eventId,
-      data: {
+    const constantProductDataValue = await context.db
+      .insert(constantProductData)
+      .values({
+        id: eventId,
         orderId: eventId,
         token0Id: token0.id,
         token1Id: token1.id,
@@ -181,10 +183,9 @@ class ProductConstantHandlerHelper extends IHandlerHelper {
         priceOracle: cowAmmData[3],
         priceOracleData: cowAmmData[4],
         appData: cowAmmData[5],
-      },
-    });
+      });
     return {
-      constantProductDataId: ConstantProductData.id,
+      constantProductDataId: constantProductDataValue.id,
       decodedSuccess: true,
     };
   }

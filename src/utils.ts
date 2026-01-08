@@ -2,6 +2,7 @@ import { Address } from "viem";
 import { composableCowAbi } from "../abis/ComposableCow";
 import { erc20Abi } from "../abis/erc20";
 import { contextType } from "./types";
+import { tokens, users } from "ponder:schema";
 
 export function callERC20Contract<T>(
   address: `0x${string}`,
@@ -47,21 +48,19 @@ export function bytes32ToAddress(hex: `0x${string}`): Address {
 }
 
 export async function getToken(address: `0x${string}`, context: contextType) {
-  const tokenId = `${address}-${context.network.chainId}`;
-  let token = await context.db.Token.findUnique({
+  const tokenId = `${address}-${context.chain.id}`;
+  let token = await context.db.find(tokens, {
     id: tokenId,
   });
   if (!token) {
     const [symbol, decimals, name] = await getErc20Data(address, context);
-    token = await context.db.Token.create({
-      id: `${address}-${context.network.chainId}`,
-      data: {
-        address,
-        chainId: context.network.chainId,
-        symbol,
-        decimals,
-        name,
-      },
+    token = await context.db.insert(tokens).values({
+      id: tokenId,
+      address,
+      chainId: context.chain.id,
+      symbol,
+      decimals,
+      name,
     });
   }
   return token;
@@ -73,17 +72,15 @@ export async function getUser(
   context: contextType
 ) {
   const userId = `${address}-${chainId}`;
-  let user = await context.db.User.findUnique({
+  let user = await context.db.find(users, {
     id: userId,
   });
 
   if (!user) {
-    user = await context.db.User.create({
+    user = await context.db.insert(users).values({
       id: userId,
-      data: {
-        address,
-        chainId,
-      },
+      address,
+      chainId,
     });
   }
   return user;
