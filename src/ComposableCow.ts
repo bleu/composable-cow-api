@@ -2,7 +2,7 @@ import { ponder } from "ponder:registry";
 import { getHandlerHelper } from "./handler";
 import { getHash, getUser } from "./utils";
 import { Address } from "viem";
-import { orders } from "ponder:schema";
+import { order } from "ponder:schema";
 
 ponder.on("composable:ConditionalOrderCreated", async ({ event, context }) => {
   const handlerHelper = getHandlerHelper(
@@ -36,7 +36,7 @@ ponder.on("composable:ConditionalOrderCreated", async ({ event, context }) => {
     .then(async (handlerData) => {
       if (!handlerData.decodedSuccess) return;
 
-      await context.db.insert(orders).values({
+      await context.db.insert(order).values({
         id: event.id,
         hash: hash,
         txHash: event.transaction.hash,

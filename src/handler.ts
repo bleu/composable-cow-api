@@ -5,8 +5,8 @@ import { hashOrder, OrderBalance, OrderKind } from "@cowprotocol/contracts";
 import { OrderSigningUtils } from "@cowprotocol/cow-sdk";
 import {
   constantProductData,
-  orderHandlers,
-  stopLossOrders,
+  orderHandler,
+  stopLossOrder,
 } from "ponder:schema";
 
 type OrderType = "StopLoss" | "ProductConstant" | undefined;
@@ -27,11 +27,11 @@ abstract class IHandlerHelper {
   ): Promise<IOrderDecodingParameters>;
   async getOrderHandler(address: Address, context: contextType) {
     const handlerId = `${address}-${context.chain.id}`;
-    let handler = await context.db.find(orderHandlers, {
+    let handler = await context.db.find(orderHandler, {
       id: handlerId,
     });
     if (!handler) {
-      handler = await context.db.insert(orderHandlers).values({
+      handler = await context.db.insert(orderHandler).values({
         id: handlerId,
         address,
         type: this.type,
@@ -119,7 +119,7 @@ class StopLossHandlerHelper extends IHandlerHelper {
       validTo
     ).slice(2)}` as `0x${string}`;
 
-    const stopLossOrder = await context.db.insert(stopLossOrders).values({
+    const stopLossOrderData = await context.db.insert(stopLossOrder).values({
       id: `${orderUid.toLowerCase()}-${context.chain.id}`,
       orderId: eventId,
       tokenSellId: tokenIn.id,
@@ -140,7 +140,7 @@ class StopLossHandlerHelper extends IHandlerHelper {
       executedTokenSellAmount: 0n,
       filledPctBps: 0n,
     });
-    return { stopLossDataId: stopLossOrder.id, decodedSuccess: true };
+    return { stopLossDataId: stopLossOrderData.id, decodedSuccess: true };
   }
 }
 
