@@ -33,18 +33,18 @@ export default createConfig({
       abi: GPv2SettlementAbi,
       address: GP_V2_SETTLEMENT_ADDRESS,
       chain: {
-        // using around 1 jan 2026 as the start block for all chains
+        // using around the first week of dec 2026 as the start block for all chains
         sepolia: {
-          startBlock: 9960000,
+          startBlock: 9760000,
         },
         gnosis: {
-          startBlock: 43945257,
+          startBlock: 43445257,
         },
         mainnet: {
-          startBlock: 24142260,
+          startBlock: 23942260,
         },
         arbitrum: {
-          startBlock: 416806968,
+          startBlock: 406806968,
         },
       },
     },
@@ -53,16 +53,16 @@ export default createConfig({
       address: COMPOSABLE_COW_ADDRESS,
       chain: {
         sepolia: {
-          startBlock: 9960000,
+          startBlock: 9760000,
         },
         gnosis: {
-          startBlock: 43945257,
+          startBlock: 43445257,
         },
         mainnet: {
-          startBlock: 24142260,
+          startBlock: 23942260,
         },
         arbitrum: {
-          startBlock: 416806968,
+          startBlock: 406806968,
         },
       },
     },
