@@ -1,7 +1,7 @@
 import { onchainTable, relations, index } from "ponder";
 
-export const orders = onchainTable(
-  "orders",
+export const order = onchainTable(
+  "order",
   (t) => ({
     id: t.text().primaryKey(),
     chainId: t.integer().notNull(),
@@ -23,23 +23,23 @@ export const orders = onchainTable(
   })
 );
 
-export const ordersRelations = relations(orders, ({ one }) => ({
-  user: one(users, { fields: [orders.userId], references: [users.id] }),
-  stopLossData: one(stopLossOrders, {
-    fields: [orders.stopLossDataId],
-    references: [stopLossOrders.id],
+export const ordersRelations = relations(order, ({ one }) => ({
+  user: one(user, { fields: [order.userId], references: [user.id] }),
+  stopLossData: one(stopLossOrder, {
+    fields: [order.stopLossDataId],
+    references: [stopLossOrder.id],
   }),
-  orderHandler: one(orderHandlers, {
-    fields: [orders.orderHandlerId],
-    references: [orderHandlers.id],
+  orderHandler: one(orderHandler, {
+    fields: [order.orderHandlerId],
+    references: [orderHandler.id],
   }),
   constantProductData: one(constantProductData, {
-    fields: [orders.constantProductDataId],
+    fields: [order.constantProductDataId],
     references: [constantProductData.id],
   }),
 }));
 
-export const orderHandlers = onchainTable(
+export const orderHandler = onchainTable(
   "order_handlers",
   (t) => ({
     id: t.text().primaryKey(),
@@ -52,7 +52,7 @@ export const orderHandlers = onchainTable(
   })
 );
 
-export const tokens = onchainTable(
+export const token = onchainTable(
   "tokens",
   (t) => ({
     id: t.text().primaryKey(),
@@ -67,7 +67,7 @@ export const tokens = onchainTable(
   })
 );
 
-export const users = onchainTable(
+export const user = onchainTable(
   "users",
   (t) => ({
     id: t.text().primaryKey(),
@@ -79,11 +79,11 @@ export const users = onchainTable(
   })
 );
 
-export const usersRelations = relations(users, ({ many }) => ({
-  orders: many(orders),
+export const usersRelations = relations(user, ({ many }) => ({
+  orders: many(order),
 }));
 
-export const stopLossOrders = onchainTable(
+export const stopLossOrder = onchainTable(
   "stop_loss_orders",
   (t) => ({
     id: t.text().primaryKey(),
@@ -111,18 +111,18 @@ export const stopLossOrders = onchainTable(
   })
 );
 
-export const stopLossOrdersRelations = relations(stopLossOrders, ({ one }) => ({
-  order: one(orders, {
-    fields: [stopLossOrders.orderId],
-    references: [orders.id],
+export const stopLossOrdersRelations = relations(stopLossOrder, ({ one }) => ({
+  order: one(order, {
+    fields: [stopLossOrder.orderId],
+    references: [order.id],
   }),
-  tokenSell: one(tokens, {
-    fields: [stopLossOrders.tokenSellId],
-    references: [tokens.id],
+  tokenSell: one(token, {
+    fields: [stopLossOrder.tokenSellId],
+    references: [token.id],
   }),
-  tokenBuy: one(tokens, {
-    fields: [stopLossOrders.tokenBuyId],
-    references: [tokens.id],
+  tokenBuy: one(token, {
+    fields: [stopLossOrder.tokenBuyId],
+    references: [token.id],
   }),
 }));
 
@@ -146,17 +146,17 @@ export const constantProductData = onchainTable(
 export const constantProductDataRelations = relations(
   constantProductData,
   ({ one }) => ({
-    order: one(orders, {
+    order: one(order, {
       fields: [constantProductData.orderId],
-      references: [orders.id],
+      references: [order.id],
     }),
-    token0: one(tokens, {
+    token0: one(token, {
       fields: [constantProductData.token0Id],
-      references: [tokens.id],
+      references: [token.id],
     }),
-    token1: one(tokens, {
+    token1: one(token, {
       fields: [constantProductData.token1Id],
-      references: [tokens.id],
+      references: [token.id],
     }),
   })
 );

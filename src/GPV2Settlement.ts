@@ -1,10 +1,10 @@
 import { ponder } from "ponder:registry";
-import { stopLossOrders } from "ponder:schema";
+import { stopLossOrder } from "ponder:schema";
 
 ponder.on("gpv2Settlement:Trade", async ({ event, context }) => {
   const orderUid = event.args.orderUid.toLowerCase();
 
-  const relatedStopLossOrder = await context.db.find(stopLossOrders, {
+  const relatedStopLossOrder = await context.db.find(stopLossOrder, {
     id: `${orderUid}-${context.chain.id}`,
   });
   if (!relatedStopLossOrder) return;
@@ -23,7 +23,7 @@ ponder.on("gpv2Settlement:Trade", async ({ event, context }) => {
     relatedStopLossOrder.tokenSellAmount;
 
   await context.db
-    .update(stopLossOrders, {
+    .update(stopLossOrder, {
       id: relatedStopLossOrder.id,
     })
     .set({
